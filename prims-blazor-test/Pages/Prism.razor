@@ -1,0 +1,32 @@
+﻿@page "/prism"
+
+@using System.Text.Json
+
+@inject IJSRuntime? JsRuntime
+
+<PageTitle>Prism Demo</PageTitle>
+
+<pre class="language-json">@_json</pre>
+
+@code {
+    private MarkupString _json;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            var data = new
+            {
+                FirstName = "Gary",
+                LastName = "Antier",
+                Age = 23
+            };
+            var json = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });
+
+            _json = new MarkupString(await JsRuntime!.InvokeAsync<string>("highlight", json));
+            StateHasChanged();
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+}
